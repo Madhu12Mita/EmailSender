@@ -1,26 +1,26 @@
 package com.equinix.EmailSender;
-
-import com.google.cloud.Timestamp;
 import com.google.cloud.bigquery.*;
-import org.json.JSONObject;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 // Sample to inserting rows into a table without running a load job.
-public class BigQueryData {
-
-    public void insertData(String request,String timestamp, boolean status)
+public class BigQueryData
+{
+    public void insertData(String to, String subject, String timestamp, boolean status)
     {
         // TODO(developer): Replace these variables before running the sample.
         String datasetName = "request_logs";
-        String tableName = "log_data";
+        String tableName = "request_data";
         // Create a row to insert
         Map<String,Object> rowContent = new HashMap<>();
-        rowContent.put("request_json", request);
-        rowContent.put("timestamp", timestamp);
-        rowContent.put("success_status", status);
+        rowContent.put("to_address",to);
+        rowContent.put("subject",subject);
+        rowContent.put("timestamp",timestamp);
+        rowContent.put("success_status",status);
+
         tableInsertRows(datasetName, tableName, rowContent);
     }
     public static void tableInsertRows(
