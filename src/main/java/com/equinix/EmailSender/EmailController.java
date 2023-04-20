@@ -1,7 +1,7 @@
 package com.equinix.EmailSender;
 import java.sql.Timestamp;
 import java.time.Instant;
-import com.equinix.EmailSender.BigQueryData;
+
 import com.equinix.EmailSender.services.EmailService;
 import com.sendgrid.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,26 +20,36 @@ public class EmailController {
     @Autowired
     private EmailService emailService;
     private Object Log;
+//    public String getJson()
+//    {
+//        //EmailRequest emailRequest=new EmailRequest();
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("to_address", emailRequest.getTo());
+//        map.put("subject", emailRequest.getSubject());
+//        map.put("body", emailRequest.getBody());
+//        ObjectMapper mapper = new ObjectMapper();
+//        String jsonString = null;
+//        try
+//        {
+//            jsonString = mapper.writeValueAsString(map);
+//        }
+//        catch (Exception e)
+//        {
+//            e.printStackTrace();
+//        }
+//        return jsonString;
+//    }
 
-    public String getJson()
+    public String getToAddress(@RequestBody EmailRequest emailRequest) throws IOException
     {
-        EmailRequest data=new EmailRequest();
-        String to_address=data.getTo();
-        String subject= data.getSubject();
-        String body= data.getBody();
-        System.out.println(subject+" "+body);
-        Map<String, Object> map = new HashMap<>();
-        map.put("to_address", to_address);
-        map.put("subject", subject);
-        map.put("body", body);
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonString = null;
-        try {
-            jsonString = mapper.writeValueAsString(map);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return jsonString;
+        String to_address=emailRequest.getTo();
+        System.out.println(String.valueOf(to_address));
+        return to_address;
+    }
+    public String getSubject(@RequestBody EmailRequest emailRequest)
+    {
+        String subject= emailRequest.getSubject();
+        return subject;
     }
     @PostMapping("/sendemail")
     public ResponseEntity<String> sendEmail(@RequestBody EmailRequest emailRequest) throws IOException {
@@ -48,13 +58,18 @@ public class EmailController {
         {
             Instant instant = Instant.now();
             Timestamp timestamp = Timestamp.from(instant);
-            String json_data=this.getJson();
+            //String json_data=this.getJson();
             BigQueryData big=new BigQueryData();
-            big.insertData(json_data,timestamp.toString(), true);
+            big.insertData(emailRequest.getTo(), emailRequest.getSubject(), String.valueOf(timestamp), true);
             return new ResponseEntity<>("Sent Succesfully", HttpStatus.OK);
         }
         else
         {
+            Instant instant = Instant.now();
+            Timestamp timestamp = Timestamp.from(instant);
+            //String json_data=this.getJson();
+            BigQueryData big=new BigQueryData();
+            //big.insertData(json_data,timestamp.toString(), false);
             return new ResponseEntity<>("Failed to Send", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
